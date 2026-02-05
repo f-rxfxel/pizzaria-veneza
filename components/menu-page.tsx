@@ -64,6 +64,9 @@ export function MenuPage() {
     const sucosLataFiltrados = menuData.bebidas.sucos_lata.filter((s) => 
       s.nome.toLowerCase().includes(query)
     )
+    const delValleFiltrado = menuData.bebidas.del_valle.sabores.filter((s) =>
+      s.toLowerCase().includes(query) || `del valle ${s}`.toLowerCase().includes(query)
+    )
 
     return {
       sucos_naturais: {
@@ -74,7 +77,11 @@ export function MenuPage() {
       refrigerantes: refrigerantesFiltrados,
       agua: aguaFiltrada,
       cervejas: cervejasFiltradas,
-      sucos_lata: sucosLataFiltrados
+      sucos_lata: sucosLataFiltrados,
+      del_valle: {
+        ...menuData.bebidas.del_valle,
+        sabores: delValleFiltrado
+      }
     }
   }, [searchQuery])
 
@@ -103,7 +110,8 @@ export function MenuPage() {
            filteredBebidas.refrigerantes.length > 0 ||
            filteredBebidas.agua.length > 0 ||
            filteredBebidas.cervejas.length > 0 ||
-           filteredBebidas.sucos_lata.length > 0
+           filteredBebidas.sucos_lata.length > 0 ||
+           filteredBebidas.del_valle.sabores.length > 0
   }, [filteredBebidas])
 
   const hasCaipirinhasResults = useMemo(() => {
@@ -197,11 +205,6 @@ export function MenuPage() {
               <EmptySearch query={searchQuery} onClear={() => setSearchQuery("")} />
             ) : (
               <>
-                <div className="p-3 rounded-xl bg-secondary/5 border border-secondary/10">
-                  <p className="text-sm text-foreground">
-                    <span className="font-semibold text-secondary">Dica:</span> Fazemos panquecas de todos os sabores de pizza!
-                  </p>
-                </div>
                 <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredPanquecas.map((item) => (
                     <SimpleItemCard
@@ -225,7 +228,8 @@ export function MenuPage() {
              filteredBebidas.refrigerantes.length === 0 && 
              filteredBebidas.agua.length === 0 && 
              filteredBebidas.cervejas.length === 0 && 
-             filteredBebidas.sucos_lata.length === 0 ? (
+             filteredBebidas.sucos_lata.length === 0 &&
+             filteredBebidas.del_valle.sabores.length === 0 ? (
               <EmptySearch query={searchQuery} onClear={() => setSearchQuery("")} />
             ) : (
               <>
@@ -318,6 +322,20 @@ export function MenuPage() {
                           tipo="bebida"
                         />
                       ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Del Valle */}
+                {filteredBebidas.del_valle.sabores.length > 0 && (
+                  <section>
+                    <SectionHeader title="Del Valle (450ml)" />
+                    <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                      <SimpleItemCard
+                        nome="Del Valle"
+                        preco={menuData.bebidas.del_valle.preco}
+                        tipo="bebida"
+                      />
                     </div>
                   </section>
                 )}

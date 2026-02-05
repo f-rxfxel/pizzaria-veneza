@@ -145,7 +145,7 @@ export function PizzaCard({ pizza, allPizzas = [] }: PizzaCardProps) {
                 <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground">
                   B: R$ {pizza.precos.broto.toFixed(2)}
                 </span>
-                <span className="text-xs px-2 py-1 rounded-md bg-secondary/10 text-secondary font-medium">
+                <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground">
                   M: R$ {pizza.precos.media.toFixed(2)}
                 </span>
                 <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground">

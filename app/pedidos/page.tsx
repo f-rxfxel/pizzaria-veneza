@@ -438,7 +438,7 @@ export default function PedidosPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-xl font-bold text-foreground">Pipeline de Pedidos</h1>
+          <h1 className="text-xl font-bold text-foreground">Painel de Pedidos</h1>
         </div>
       </div>
       <div className="flex-1 overflow-hidden">

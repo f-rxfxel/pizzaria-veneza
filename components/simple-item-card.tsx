@@ -40,6 +40,8 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
   const [observacoes, setObservacoes] = useState("")
   // Select para panqueca de pizza
   const [selectedGeneralPizza, setSelectedGeneralPizza] = useState("")
+  // Select para del valle
+  const [selectedDelValleFlavor, setSelectedDelValleFlavor] = useState("")
 
 
   const handleAddToCart = () => {
@@ -51,6 +53,9 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
         finalNome = `Panqueca sabor ${pizza.nome}`
         finalObs = pizza.ingredientes + (observacoes ? ` | ${observacoes}` : "")
       }
+    }
+    if (tipo === "bebida" && nome.includes("Del Valle") && selectedDelValleFlavor) {
+      finalNome = `Del Valle ${selectedDelValleFlavor} (450ml)`
     }
     const cartItem: CartItem = {
       id: `${tipo}-${finalNome}-${Date.now()}`,
@@ -66,6 +71,7 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
     setQuantidade(1)
     setObservacoes("")
     setSelectedGeneralPizza("")
+    setSelectedDelValleFlavor("")
     setIsDialogOpen(false)
   }
 
@@ -156,6 +162,28 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
                       .find((p: any) => p.id === selectedGeneralPizza)?.ingredientes}
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* Select de sabores para Del Valle */}
+            {tipo === "bebida" && nome.includes("Del Valle") && (
+              <div className="mb-4">
+                <Label className="text-base font-semibold">Sabor</Label>
+                <Select
+                  value={selectedDelValleFlavor}
+                  onValueChange={setSelectedDelValleFlavor}
+                >
+                  <SelectTrigger className="mt-2 w-full">
+                    <SelectValue placeholder="Selecione um sabor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {menuData.bebidas.del_valle.sabores.map((sabor) => (
+                      <SelectItem key={sabor} value={sabor}>
+                        {sabor}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
             {/* Observações */}

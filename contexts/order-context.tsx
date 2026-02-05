@@ -34,7 +34,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const [cliente, setCliente] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Load orders from localStorage on mount
+  // Load orders and cart from localStorage on mount
   useEffect(() => {
     try {
       const storedOrders = localStorage.getItem("pizzaria-orders")
@@ -45,8 +45,14 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         }))
         setOrders(parsedOrders)
       }
+
+      const storedCart = localStorage.getItem("pizzaria-cart")
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart)
+        setCart(parsedCart)
+      }
     } catch (error) {
-      console.error("Erro ao carregar pedidos:", error)
+      console.error("Erro ao carregar dados:", error)
     }
     setIsLoaded(true)
   }, [])
@@ -61,6 +67,17 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [orders, isLoaded])
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem("pizzaria-cart", JSON.stringify(cart))
+      } catch (error) {
+        console.error("Erro ao salvar carrinho:", error)
+      }
+    }
+  }, [cart, isLoaded])
 
   const addToCart = useCallback((item: CartItem) => {
     setCart((prev) => [...prev, item])

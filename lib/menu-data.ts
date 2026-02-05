@@ -107,9 +107,12 @@ export const menuData = {
       { nome: "Original / Amstel / Eisenbahn (600ml)", preco: 16.00 }
     ],
     sucos_lata: [
-      { nome: "Ice Tea Pêssego / Limão (450ml)", preco: 6.00 },
-      { nome: "Del Valle (Pêssego, Uva, Goiaba, Manga)", preco: 6.00 }
-    ]
+      { nome: "Ice Tea Pêssego / Limão (450ml)", preco: 6.00 }
+    ],
+    del_valle: {
+      preco: 6.00,
+      sabores: ["Pêssego", "Uva", "Goiaba", "Manga"]
+    }
   },
   caipirinhas: {
     preco: 30.00,
