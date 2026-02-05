@@ -11,7 +11,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Pizzaria Veneza - Sistema de Pedidos",
   description: "Sistema de gestão de pedidos da Pizzaria Veneza",
-  generator: "v0.app",
   icons: {
     icon: [
       {

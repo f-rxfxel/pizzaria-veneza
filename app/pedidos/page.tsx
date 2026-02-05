@@ -94,7 +94,7 @@ function KanbanColumn({
   const nextStatus = currentIndex < statusOrder.length - 1 ? statusOrder[currentIndex + 1] : null
 
   const handlePrintDirect = (order: Order) => {
-    const printWindow = window.open("", "", "width=400,height=600")
+    const printWindow = window.open("", "_blank")
     if (!printWindow) return
 
     const content = `

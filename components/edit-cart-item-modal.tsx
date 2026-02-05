@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Minus, Plus, CircleDot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -52,7 +52,7 @@ const getAllPizzas = (): PizzaItem[] => {
 
 export function EditCartItemModal({ item, open, onOpenChange }: EditCartItemModalProps) {
   const { updateCartItem } = useOrder()
-  const allPizzas = getAllPizzas()
+  const allPizzas = useMemo(() => getAllPizzas(), [])
   
   // State for pizza editing
   const [selectedSize, setSelectedSize] = useState<PizzaSize>(item.tamanho || "media")

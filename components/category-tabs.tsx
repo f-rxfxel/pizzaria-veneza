@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Pizza, Cake, Utensils, Wine, GlassWater, Search, X } from "lucide-react"
+import { Pizza, Cake, Utensils, Wine, GlassWater, Search, X, Lollipop, CupSoda, Martini } from "lucide-react"
 import { useRef, useEffect } from "react"
 
 export type Category = "pizzas-salgadas" | "pizzas-doces" | "panquecas" | "bebidas" | "caipirinhas"
@@ -15,10 +15,10 @@ interface CategoryTabsProps {
 
 const categories = [
   { id: "pizzas-salgadas" as Category, label: "Pizzas Salgadas", shortLabel: "Salgadas", icon: Pizza },
-  { id: "pizzas-doces" as Category, label: "Pizzas Doces", shortLabel: "Doces", icon: Cake },
+  { id: "pizzas-doces" as Category, label: "Pizzas Doces", shortLabel: "Doces", icon: Lollipop },
   { id: "panquecas" as Category, label: "Panquecas", shortLabel: "Panquecas", icon: Utensils },
-  { id: "bebidas" as Category, label: "Bebidas", shortLabel: "Bebidas", icon: GlassWater },
-  { id: "caipirinhas" as Category, label: "Caipirinhas", shortLabel: "Drinks", icon: Wine },
+  { id: "bebidas" as Category, label: "Bebidas", shortLabel: "Bebidas", icon: CupSoda },
+  { id: "caipirinhas" as Category, label: "Caipirinhas", shortLabel: "Drinks", icon: Martini },
 ]
 
 export function CategoryTabs({ 
@@ -49,7 +49,7 @@ export function CategoryTabs({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Buscar no cardapio..."
+              placeholder="Buscar no cardápio..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className={cn(

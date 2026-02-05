@@ -75,19 +75,6 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
     setIsDialogOpen(false)
   }
 
-  const handleQuickAdd = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const cartItem: CartItem = {
-      id: `${tipo}-${nome}-${Date.now()}`,
-      tipo,
-      nome,
-      quantidade: 1,
-      precoUnitario: preco,
-      precoTotal: preco,
-    }
-    addToCart(cartItem)
-  }
-
   return (
     <>
       <Card
@@ -110,7 +97,7 @@ export function SimpleItemCard({ nome, preco, tipo, descricao }: SimpleItemCardP
             <Button
               size="icon"
               className="shrink-0 h-12 w-12 rounded-full group-hover:scale-110 transition-transform bg-secondary hover:bg-secondary/90"
-              onClick={handleQuickAdd}
+              onClick={() => setIsDialogOpen(true)}
             >
               <Plus className="h-5 w-5" />
             </Button>
