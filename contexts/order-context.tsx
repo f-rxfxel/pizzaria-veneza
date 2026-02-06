@@ -20,6 +20,7 @@ interface OrderContextType {
   createOrder: () => Order | null
   updateOrderStatus: (orderId: string, status: OrderStatus) => void
   updateOrder: (orderId: string, updates: Partial<Order>) => void
+  deleteOrder: (orderId: string) => void
   deleteOrderItem: (orderId: string, itemId: string) => void
   updateOrderItem: (orderId: string, itemId: string, updates: Partial<CartItem>) => void
   getOrderById: (orderId: string) => Order | undefined
@@ -177,6 +178,10 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const deleteOrder = useCallback((orderId: string) => {
+    setOrders((prev) => prev.filter((order) => order.id !== orderId))
+  }, [])
+
   const deleteOrderItem = useCallback((orderId: string, itemId: string) => {
     setOrders((prev) =>
       prev.map((order) => {
@@ -245,6 +250,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         createOrder,
         updateOrderStatus,
         updateOrder,
+        deleteOrder,
         deleteOrderItem,
         updateOrderItem,
         getOrderById,

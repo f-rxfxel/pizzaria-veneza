@@ -234,7 +234,7 @@ function CartContent() {
         </div>
 
         {/* Clear Cart */}
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-8">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" size="sm" className="text-destructive bg-transparent">

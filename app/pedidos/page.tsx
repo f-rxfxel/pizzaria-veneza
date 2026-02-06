@@ -11,7 +11,9 @@ import {
   Printer,
   Pencil,
   ChevronRight,
+  ChevronLeft,
   GripVertical,
+  Trash2,
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -23,6 +25,17 @@ import { ReceiptModal } from "@/components/receipt-modal"
 import { EditOrderModal } from "@/components/edit-order-modal"
 import type { Order, OrderStatus } from "@/lib/menu-data"
 import { cn } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const statusConfig: Record<OrderStatus, { label: string; icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string; borderColor: string }> = {
   pendente: { 
@@ -67,8 +80,10 @@ function KanbanColumn({
   status, 
   orders, 
   onAdvance,
+  onGoBack,
   onPrint,
   onEdit,
+  onDelete,
   onDragStart,
   onDragEnd,
   onDrop,
@@ -79,8 +94,10 @@ function KanbanColumn({
   status: OrderStatus
   orders: Order[]
   onAdvance: (orderId: string, newStatus: OrderStatus) => void
+  onGoBack: (orderId: string, prevStatus: OrderStatus) => void
   onPrint: (order: Order) => void
   onEdit: (order: Order) => void
+  onDelete: (orderId: string) => void
   onDragStart: (orderId: string) => void
   onDragEnd: () => void
   onDrop: (status: OrderStatus) => void
@@ -92,11 +109,9 @@ function KanbanColumn({
   const StatusIcon = config.icon
   const currentIndex = statusOrder.indexOf(status)
   const nextStatus = currentIndex < statusOrder.length - 1 ? statusOrder[currentIndex + 1] : null
+  const prevStatus = currentIndex > 0 ? statusOrder[currentIndex - 1] : null
 
   const handlePrintDirect = (order: Order) => {
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) return
-
     const content = `
       <!DOCTYPE html>
       <html>
@@ -152,13 +167,31 @@ function KanbanColumn({
       </html>
     `
 
-    printWindow.document.write(content)
-    printWindow.document.close()
-    
-    setTimeout(() => {
-      printWindow.print()
-      printWindow.close()
-    }, 250)
+    // Criar iframe oculto para impressão
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'absolute'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = 'none'
+    document.body.appendChild(iframe)
+
+    const iframeDoc = iframe.contentWindow?.document
+    if (!iframeDoc) return
+
+    iframeDoc.open()
+    iframeDoc.write(content)
+    iframeDoc.close()
+
+    // Aguardar o carregamento e acionar impressão
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.print()
+        // Remover iframe após impressão
+        setTimeout(() => {
+          document.body.removeChild(iframe)
+        }, 1000)
+      }, 250)
+    }
 
     // Move order to "em_preparo" status
     if (status !== "em_preparo" && status !== "pronto" && status !== "entregue") {
@@ -285,19 +318,60 @@ function KanbanColumn({
                     <Printer className="h-3 w-3 mr-1" />
                     Imprimir
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Remover pedido?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Deseja remover permanentemente o pedido {order.id}? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => onDelete(order.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Remover
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
 
-                {/* Advance Button */}
-                {nextStatus && (
-                  <Button
-                    size="sm"
-                    className="w-full mt-2 h-9 bg-secondary hover:bg-secondary/90"
-                    onClick={() => onAdvance(order.id, nextStatus)}
-                  >
-                    <span>Mover para {statusConfig[nextStatus].label}</span>
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                )}
+                {/* Navigation Buttons */}
+                <div className="flex gap-2 mt-2">
+                  {prevStatus && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 h-9"
+                      onClick={() => onGoBack(order.id, prevStatus)}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Voltar</span>
+                    </Button>
+                  )}
+                  {nextStatus && (
+                    <Button
+                      size="sm"
+                      className="flex-1 h-9 bg-secondary hover:bg-secondary/90"
+                      onClick={() => onAdvance(order.id, nextStatus)}
+                    >
+                      <span className="text-xs">Avançar</span>
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))
@@ -308,7 +382,7 @@ function KanbanColumn({
 }
 
 function OrdersContent() {
-  const { orders, updateOrderStatus, getOrderById } = useOrder()
+  const { orders, updateOrderStatus, deleteOrder, getOrderById } = useOrder()
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [receiptOpen, setReceiptOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -359,6 +433,14 @@ function OrdersContent() {
     updateOrderStatus(orderId, newStatus)
   }
 
+  const handleGoBack = (orderId: string, prevStatus: OrderStatus) => {
+    updateOrderStatus(orderId, prevStatus)
+  }
+
+  const handleDelete = (orderId: string) => {
+    deleteOrder(orderId)
+  }
+
   // Group orders by status
   const ordersByStatus = statusOrder.reduce((acc, status) => {
     acc[status] = orders.filter(order => order.status === status)
@@ -395,8 +477,10 @@ function OrdersContent() {
               status={status}
               orders={ordersByStatus[status]}
               onAdvance={handleAdvance}
+              onGoBack={handleGoBack}
               onPrint={handlePrint}
               onEdit={handleEdit}
+              onDelete={handleDelete}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               onDrop={handleDrop}
